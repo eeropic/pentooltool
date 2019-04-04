@@ -1,0 +1,160 @@
+:root {
+	font-size: 16px;
+}
+
+html {
+	--button-normal: #c0c0c0;
+	--button-hover: #ddd;
+	--color-1: #333;
+	--color-2: #ff83b4;
+	--color-3: #890d75;
+	--color-4: #0000ff;
+	--color-5: #00ffff;
+}
+
+.bg-maroon {
+	background-color: #85144b;
+}
+
+body {
+	margin: 0;
+	background-color: #f0f0f0;
+	font-family: Monaco, monospace;
+}
+
+body.dragging,
+body.dragging * {
+	cursor: move !important;
+}
+
+.dragged {
+	position: absolute;
+	opacity: 0.6;
+	z-index: 2000;
+	box-shadow: 0px 4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+ol.sortable {
+	padding: 0.5rem;
+	background: #e0e0e0;
+	border-radius: 1rem;
+	height: 3rem;
+	margin-right: 0.25rem;
+	margin-top: 0.25rem;
+}
+
+ol.sortable li.placeholder {
+	position: relative;
+	width: calc(3rem - 4px);
+	height: calc(3rem - 4px);
+	margin-right: 0.25rem;
+	margin-bottom: 0.25rem;
+	line-height: 3rem;
+	display: block;
+	border: 2px dotted #bbb;
+	border-radius: 0.5rem;
+	/** More li styles **/
+}
+ol.sortable li.placeholder:before {
+	position: absolute;
+	/** Define arrowhead **/
+	color: red;
+}
+
+#canvas {
+	z-index: -1;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background-color: transparent;
+}
+canvas[resize] {
+	width: 100%;
+	height: 100%;
+}
+.gui {
+	z-index: 999;
+	height: 8rem;
+	position: absolute;
+	bottom: 0.5rem;
+	left: 0.5rem;
+}
+
+.command-rows {
+	display: flex;
+	position: relative;
+}
+
+.commands,
+.components {
+	display: flex;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	font-size: 2rem;
+}
+
+.sortable:before {
+	color: var(--button-normal);
+	width: 3rem;
+	display: block;
+	margin-right: 0.25rem;
+	user-select: none;
+	content: attr(data-title);
+}
+
+.btn {
+	margin-right: 0.25rem;
+	margin-bottom: 0.25rem;
+}
+
+.btn:hover {
+	opacity: 0.7;
+}
+
+.btn:active {
+	background: var(--button-normal);
+}
+
+.fas {
+	width: 3rem;
+	height: 3rem;
+	line-height: 3rem;
+	font-size: 1.5rem;
+	text-align: center;
+	vertical-align: middle;
+	display: block;
+	border-radius: 8px;
+	background: var(--button-normal);
+	color: #fff;
+}
+
+.commands .fas:not(.color) {
+	background: #fff;
+	color: #000;
+}
+
+.fas:active {
+}
+
+.color-1 {
+	background: var(--color-1);
+}
+.color-2 {
+	background: var(--color-2);
+}
+.color-3 {
+	background: var(--color-3);
+}
+.color-4 {
+	background: var(--color-4);
+}
+.color-5 {
+	background: var(--color-5);
+}
+
+.commands .select {
+	box-shadow: #33ddff 0px 0px 0px 4px;
+}

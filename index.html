@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Pen Tool Tool</title>
+		<link rel="stylesheet" href="css/fontawesome-5-all.min.css"/>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+
+	<body>
+		<div id="app">
+			<canvas id="canvas" resize keepalive="true"></canvas>
+			<div class="gui">
+				<div class="command-rows">
+					<ol id="commands" data-title="&#xf304;" class="commands sortable"></ol>
+					<!--<i class="fas fa-remove"></i>-->
+				</div>
+				<ol id="components" data-title="&#xf1b3;" class="components sortable">
+				</ol>
+				<ol id="colors" data-title="&#xf1b3;" class="colors sortable"> </ol>
+			</div>
+		</div>
+		<script src="lib/paper-full.min.js"></script>
+		<script src="lib/jquery.min.js"></script>
+		<script src="lib/jquery-sortable-min.js"></script>
+		<script src="js/commands.js"></script>
+		<script src="js/index.js"></script>
+	</body>
+</html>
