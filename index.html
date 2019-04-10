@@ -1,29 +1,42 @@
 <!DOCTYPE html>
+<html manifest="cache.manifest">
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<title>Pen Tool Tool</title>
-		<link rel="stylesheet" href="css/fontawesome-5-all.min.css"/>
-		<link rel="stylesheet" href="css/style.css" />
-	</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Pen Tool Tool3" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, maximum-scale=1, user-scalable=0"/>
 
-	<body>
-		<div id="app">
-			<canvas id="canvas" resize keepalive="true"></canvas>
-			<div class="gui">
-				<div class="command-rows">
-					<ol id="commands" data-title="&#xf304;" class="commands sortable"></ol>
-					<!--<i class="fas fa-remove"></i>-->
-				</div>
-				<ol id="components" data-title="&#xf1b3;" class="components sortable">
-				</ol>
-				<ol id="colors" data-title="&#xf1b3;" class="colors sortable"> </ol>
-			</div>
-		</div>
-		<script src="lib/paper-full.min.js"></script>
-		<script src="lib/jquery.min.js"></script>
-		<script src="lib/jquery-sortable-min.js"></script>
-		<script src="js/commands.js"></script>
-		<script src="js/index.js"></script>
-	</body>
+    <title>Pen Tool Tool3</title>
+    <link rel="stylesheet" href="css/fontawesome-5-all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <div id="app">
+      <canvas id="canvas" resize keepalive="true"></canvas>
+      <div id="clear-canvas" class="fas fa-trash block"></div>
+      <div id="gui">
+        <div class="command-rows">
+          <ol id="commands" data-title="&#xf304;" class="commands blocks sortable"></ol>
+          <!--<i class="fas fa-remove"></i>-->
+        </div>
+        <div class="component-columns">
+          <ol id="components" data-title="&#xf1b3;" class="components blocks sortable"></ol>
+        </div>
+      </div>
+
+      <div class="color-gui">
+          <ol id="colors" data-title="&#xf53f;" class="colors blocks-vertical"></ol>
+      </div>
+      
+    </div>
+    <script src="lib/paper-full.min.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery-sortable-min.js"></script>
+    <script src="js/commands.js"></script>
+    <script src="js/index.js"></script>
+  </body>
 </html>

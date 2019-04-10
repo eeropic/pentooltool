@@ -1,0 +1,26 @@
+CACHE MANIFEST
+ 
+# Version 0.1
+    
+NETWORK:
+*
+    
+CACHE:
+webfonts/fa-solid-900.woff2
+webfonts/fa-solid-900.woff
+webfonts/fa-solid-900.ttf
+webfonts/fa-solid-900.svg
+webfonts/fa-solid-900.eot
+webfonts/fa-regular-400.woff2
+webfonts/fa-regular-400.woff
+webfonts/fa-regular-400.ttf
+webfonts/fa-regular-400.svg
+webfonts/fa-regular-400.eot
+lib/paper-full.min.js
+lib/jquery.min.js
+lib/jquery-sortable-min.js
+js/index.js
+js/commands.js
+index.html
+css/style.css
+css/fontawesome-5-all.min.css

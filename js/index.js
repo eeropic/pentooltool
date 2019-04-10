@@ -5,10 +5,21 @@ document.body.addEventListener("touchstart", null, { passive: false })
 document.body.addEventListener("touchmove", null, { passive: false })
 document.body.addEventListener("touchend", null, { passive: false })
 
+$("#gui, #components, #commands, #colors").on("touchstart touchmove", function(e) {
+	e.preventDefault()
+})
+
+var globalColors = ["#303240", "#0033dd", "#ff83b4", "#eebb44", "#33ddff"]
+globalColors.forEach(function(val, idx) {
+	document.documentElement.style.setProperty("--color-" + (idx + 1), val)
+})
+
+var grid = 20
+
 project.currentStyle = {
-	fillColor: "#ff83b4",
+	fillColor: globalColors[0],
+	strokeColor: globalColors[0],
 	strokeWidth: 0,
-	strokeColor: "#666",
 	strokeJoin: "round",
 	strokeCap: "round"
 }
@@ -19,22 +30,27 @@ function mapCommands(id, event) {
 		.map(function(idx, elem) {
 			return {
 				id: $(elem).data().cmd,
-				color: $(elem).data().color != null ? $(elem).data().color : null
+				color: $(elem).attr("data-color") != null ? $(elem).attr("data-color") : null
 			}
 		})
 
-	if (cmds.length == 0) cmds = [{ id: "draw-path" }]
-
 	for (let cmd of cmds) {
 		if (commands[cmd.id] != null) {
-			cmd.color == null
-				? commands[cmd.id].cmd(event)
-				: commands[cmd.id].cmd(event, cmd.color)
+			if (cmd.color != null) {
+				if (cmd.color == 6) {
+					var newColor = globalColors[event.count % globalColors.length]
+				} else {
+					var newColor = globalColors[cmd.color - 1]
+				}
+			} else {
+				var newColor = project.currentStyle.fillColor
+			}
+			commands[cmd.id].cmd(event, newColor)
 		}
 	}
 }
 
-var penTool = new Tool({ minDistance: 3 })
+var penTool = new Tool({ minDistance: 2 })
 penTool.text = "Hello World!"
 penTool.prevDelta = 0
 penTool.currDelta = 0
@@ -45,6 +61,9 @@ penTool.avgDelta = 0
 penTool.on({
 	mousedown(e) {
 		this.items = []
+		this.speed = false
+		this.snap = false
+		this.randomize = false
 		mapCommands("#commands", e)
 	},
 	mousedrag(e) {
@@ -55,7 +74,6 @@ penTool.on({
 	},
 	mouseup(e) {
 		mapCommands("#commands", e)
-		//console.log(this.items)
 		this.items = []
 	}
 })
@@ -65,17 +83,30 @@ penTool.on({
 $("#components").append(
 	Object.keys(commands).map(function(key, index) {
 		let obj = commands[key]
-		if (key != "color")
-			return `<li class="fas btn ${obj.icon}" data-cmd="${key}"/>`
+		if (key != "color") {
+			return `<li class="fas block ${obj.icon}" data-cmd="${key}"/>`
+		}
 	})
 )
 
 //colors
-for (let i = 1; i < 6; i++) {
-	$("#components").append(
-		`<li class="fas btn fa-tint color color-${i}" data-cmd="color" data-color="${i}"/>`
-	)
+for (let i = 1; i <= globalColors.length + 1; i++) {
+	$("#colors").append(`<li class="fas block color color-${i}" data-cmd="color" data-color="${i}"/>`)
 }
+
+//default tool
+
+let createPath = $("#components li")
+	.first()
+	.clone()
+
+createPath.addClass("color-1 select")
+
+$("#commands").append(createPath)
+
+$(".color")
+	.first()
+	.addClass("select")
 
 //GUI drag & drop handling
 
@@ -106,26 +137,45 @@ $("ol.commands").sortable({
 		this.canceled = true
 	},
 	onDrop: function($item, container, _super, event) {
-		/*
-			if ($($item).data().cmd == "create-text") {
-				let inputText = prompt("Enter text");
-				$($item).attr("data-text", inputText);
-				penTool.text = inputText;
-			}
-    */
 		$item.removeClass(container.group.options.draggedClass).removeAttr("style")
 		$("body").removeClass(container.group.options.bodyClass)
 		if (this.canceled) {
 			$item.remove()
-			if (this.cloneItem != null && container.target[0].id != "components")
-				this.cloneItem.remove()
+			if (this.cloneItem != null && container.target[0].id != "components") this.cloneItem.remove()
 			this.canceled = false
 		} else {
+			let selectedColor = $("#colors .select")
+				.first()
+				.data("color")
+
+			if (
+				$($item)
+					.data("cmd")
+					.includes("create")
+			) {
+				$("li.block")
+					.not(".color")
+					.each(function(e) {
+						$(this).removeClass("select")
+					})
+				$($item).addClass("select")
+				$($item).attr("data-color", selectedColor)
+				$($item).addClass("color-" + selectedColor)
+			}
+
 			$($item).on("mousedown touchend", function(e) {
-				$("li.btn").each(function(e) {
-					$(this).removeClass("select")
-				})
-				$(this).addClass("select")
+				if (
+					$($item)
+						.data("cmd")
+						.includes("create")
+				) {
+					$("li.block")
+						.not(".color")
+						.each(function(e) {
+							$(this).removeClass("select")
+						})
+					$(this).addClass("select")
+				}
 			})
 		}
 		this.cloneItem = null
@@ -139,15 +189,52 @@ $("ol.components").sortable({
 	vertical: false
 })
 
+/*
+$("ol.components").click(function(e) {
+  //console.log(this, e)
+  let clone = e.target.cloneNode(true)
+  console.log(e)
+  $("ol.commands").append(clone)
+})
+*/
+
 function onFrame(event) {
 	view.update()
 }
 
 $(".color").on("mousedown touchend", function(e) {
+	e.preventDefault()
 	$(".color").each(function(e) {
 		$(this).removeClass("select")
 	})
 	$(this).addClass("select")
+	let colorIdx = $(this).attr("data-color")
+	let colorHex = globalColors[colorIdx]
+
+	//if ($(".commands .select").length > 0) project.currentStyle.fillColor = colorHex
+
+	$(".commands .select").each(function() {
+		if (
+			$(this)
+				.data("cmd")
+				.includes("create")
+		) {
+			$(this).removeClass("color-1 color-2 color-3 color-4 color-5 color-6")
+			$(this).addClass("color-" + colorIdx)
+			$(this).attr("data-color", colorIdx)
+		}
+	})
+})
+
+$("#clear-canvas").click(function() {
+	project.clear()
 })
 
 //        $("html").attr("style", "--color-1:hotpink");
+
+/*
+      let bodyStyles = window.getComputedStyle(document.body)
+      let color = 
+      project.currentStyle.fillColor = color
+      project.currentStyle.strokeColor = color
+      */
