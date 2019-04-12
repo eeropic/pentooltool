@@ -217,6 +217,17 @@ $("ol.components").click(function(e) {
 })
 */
 
+$("ol#commands")
+	.find(".block")
+	.click(function(e) {
+		$("ol#commands")
+			.find(".block")
+			.each(function(e) {
+				$(this).removeClass("select")
+			})
+		$($(this)).addClass("select")
+	})
+
 function onFrame(event) {
 	view.update()
 }
@@ -247,6 +258,8 @@ $(".color").on("mousedown touchend", function(e) {
 
 $("#clear-canvas").click(function() {
 	project.clear()
+	handleUndoHistory(penTool)
+	updateUndoButtons(penTool)
 })
 
 $("#undo").click(function() {

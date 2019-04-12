@@ -193,13 +193,18 @@ var commands = {
 		icon: "fa-th"
 	},
 
-	"clone-items": {
-		cmd: function(e) {
+	"create-clone": {
+		cmd: function(e, color) {
 			if (e.type == "mouseup") {
+				let cloneItems = []
 				e.tool.items.forEach(function(elem) {
 					let clone = elem.clone()
-					clone.segments[0].point.x += 100
+					if (clone.strokeColor != null) clone.strokeColor = color
+					if (clone.fillColor != null) clone.fillColor = color
+					cloneItems.push(clone)
+					clone.position = clone.position.add([grid, -grid])
 				})
+				e.tool.items = cloneItems
 			}
 		},
 		icon: "fa-clone"
@@ -236,6 +241,16 @@ var commands = {
 			}
 		},
 		icon: "fa-dice"
+	},
+	mirror: {
+		cmd: function(e) {
+			if (e.type == "mouseup") {
+				e.tool.items.forEach(function(elem) {
+					let clone = elem.clone().scale([-1, 1], view.center)
+				})
+			}
+		},
+		icon: "mirror"
 	}
 }
 
