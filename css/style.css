@@ -235,8 +235,14 @@ ol#commands::after {
 	box-shadow: #33ddff 0px 0px 0px 4px;
 }
 
-#clear-canvas {
+#gui-top {
 	position: absolute;
 	top: 0;
 	right: 0;
+	display: flex;
+}
+
+#undo,
+#redo {
+	opacity: 0.5;
 }

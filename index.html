@@ -17,7 +17,11 @@
   <body>
     <div id="app">
       <canvas id="canvas" resize keepalive="true"></canvas>
-      <div id="clear-canvas" class="fas fa-trash block"></div>
+      <div id="gui-top">
+        <div id="undo" class="fas fa-undo block"></div>
+        <div id="redo" class="fas fa-redo block"></div>
+        <div id="clear-canvas" class="fas fa-trash block"></div>
+      </div>
       <div id="gui">
         <div class="command-rows">
           <ol id="commands" data-title="&#xf304;" class="commands blocks sortable"></ol>

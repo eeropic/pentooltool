@@ -16,14 +16,6 @@ globalColors.forEach(function(val, idx) {
 
 var grid = 20
 
-project.currentStyle = {
-	fillColor: globalColors[0],
-	strokeColor: globalColors[0],
-	strokeWidth: 0,
-	strokeJoin: "round",
-	strokeCap: "round"
-}
-
 function mapCommands(id, event) {
 	let cmds = $(id)
 		.children()
@@ -43,7 +35,7 @@ function mapCommands(id, event) {
 					var newColor = globalColors[cmd.color - 1]
 				}
 			} else {
-				var newColor = project.currentStyle.fillColor
+				var newColor = null
 			}
 			commands[cmd.id].cmd(event, newColor)
 		}
@@ -55,8 +47,31 @@ penTool.text = "Hello World!"
 penTool.prevDelta = 0
 penTool.currDelta = 0
 penTool.avgDelta = 0
+penTool.history = {
+	projects: [project.exportJSON(false)],
+	index: 0
+}
 
 //mouse event handling
+
+function updateUndoButtons(tool) {
+	logHistory()
+	$("#undo").css("opacity", tool.history.index > 0 && tool.history.projects.length > 0 ? 1 : 0.5)
+	$("#redo").css("opacity", tool.history.index < tool.history.projects.length - 1 ? 1 : 0.5)
+}
+
+function handleUndoHistory(tool) {
+	tool.history.projects.push(project.exportJSON(false))
+	tool.history.index = Math.min(tool.history.index + 1, tool.history.projects.length - 1)
+	if (tool.history.projects.length > 0 && tool.history.index < Math.max(0, tool.history.projects.length - 1)) {
+		tool.history.projects.length = Math.max(1, tool.history.index)
+		tool.history.projects.push(project.exportJSON(false))
+		tool.history.index = tool.history.projects.length - 1
+	} else if (tool.history.projects.length > 4) {
+		tool.history.projects.shift()
+		tool.history.index = Math.max(0, tool.history.index - 1)
+	}
+}
 
 penTool.on({
 	mousedown(e) {
@@ -65,6 +80,7 @@ penTool.on({
 		this.snap = false
 		this.randomize = false
 		mapCommands("#commands", e)
+		//this.history.projects.length = Math.max(0, this.history.index - 1)
 	},
 	mousedrag(e) {
 		this.prevDelta = this.currDelta
@@ -75,6 +91,8 @@ penTool.on({
 	mouseup(e) {
 		mapCommands("#commands", e)
 		this.items = []
+		handleUndoHistory(this)
+		updateUndoButtons(this)
 	}
 })
 
@@ -100,6 +118,7 @@ let createPath = $("#components li")
 	.first()
 	.clone()
 
+createPath.attr("data-color", 1)
 createPath.addClass("color-1 select")
 
 $("#commands").append(createPath)
@@ -229,6 +248,26 @@ $(".color").on("mousedown touchend", function(e) {
 $("#clear-canvas").click(function() {
 	project.clear()
 })
+
+$("#undo").click(function() {
+	penTool.history.index = Math.max(0, penTool.history.index - 1)
+	project.clear()
+	project.importJSON(penTool.history.projects[penTool.history.index])
+	logHistory()
+	updateUndoButtons(penTool)
+})
+
+$("#redo").click(function() {
+	penTool.history.index = Math.max(0, Math.min(penTool.history.projects.length - 1, penTool.history.index + 1))
+	project.clear()
+	project.importJSON(penTool.history.projects[penTool.history.index])
+	logHistory()
+	updateUndoButtons(penTool)
+})
+
+function logHistory() {
+	console.log("i " + penTool.history.index, "len " + penTool.history.projects.length)
+}
 
 //        $("html").attr("style", "--color-1:hotpink");
 

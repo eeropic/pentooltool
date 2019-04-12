@@ -5,13 +5,15 @@ var commands = {
 				? e.delta
 						.rotate(-90)
 						.normalize()
-						.multiply(Math.random() * 40)
+						.multiply(Math.random() * grid * 2 - grid)
 				: new Point(0, 0)
 			if (e.type == "mousedown") {
 				let item = new Path({
 					fillColor: e.tool.speed ? color : null,
 					strokeWidth: 4,
-					strokeColor: color
+					strokeColor: e.tool.speed ? null : color,
+					strokeJoin: "round",
+					strokeCap: "round"
 				})
 				e.tool.items.push(item)
 			} else if (e.type == "mousedrag") {
@@ -19,8 +21,8 @@ var commands = {
 					e.tool.items.forEach(function(item) {
 						if (item.className == "Path") {
 							if (e.count < 5) {
-								item.strokeWidth = e.tool.speed ? 0 : 4
 								item.fillColor = e.tool.speed ? color : null
+								item.strokeColor = e.tool.speed ? null : color
 							}
 
 							item.add(
@@ -52,9 +54,18 @@ var commands = {
 			} else if (e.type == "mouseup") {
 				e.tool.items.forEach(function(item) {
 					if (item.className == "Path") {
-						if (!e.tool.snap) item.simplify()
-						if (e.tool.speed) item.closed = true
+						if (!e.tool.speed) item.fillColor = null
+						item.closed = false
+						if (!e.tool.snap) {
+							item.simplify()
+						}
+						if (e.tool.speed) {
+							//item.closed = true
+							item.firstSegment.point = e.point
+							item.lastSegment.point = e.point
+						}
 					}
+					console.log(item.fillColor)
 				})
 			}
 		},
@@ -88,7 +99,7 @@ var commands = {
 				? e.delta
 						.rotate(-90)
 						.normalize()
-						.multiply(Math.random() * 40)
+						.multiply(Math.random() * grid * 2 - grid)
 				: new Point(0, 0)
 
 			let size = e.type == "mousedrag" ? (e.tool.speed ? e.tool.avgDelta : 20) : 20
@@ -97,6 +108,11 @@ var commands = {
 				position: e.point.add(randomPt),
 				fillColor: color
 			})
+			if (e.tool.snap) {
+				item.position.x = Math.round(item.position.x / grid) * grid
+				item.position.y = Math.round(item.position.y / grid) * grid
+			} else {
+			}
 			e.tool.items.push(item)
 		},
 		icon: "fa-square"
@@ -166,13 +182,10 @@ var commands = {
 			e.tool.snap = true
 
 			e.tool.items.forEach(function(item) {
-				if (item.className != "Path") {
-					item.position.x = Math.round(item.position.x / 16) * 16
-					item.position.y = Math.round(item.position.y / 16) * 16
-				} else {
+				if (item.className == "Path") {
 					for (let seg of item.segments) {
-						seg.point.x = Math.round(seg.point.x / 20) * 20
-						seg.point.y = Math.round(seg.point.y / 20) * 20
+						seg.point.x = Math.round(seg.point.x / grid) * grid
+						seg.point.y = Math.round(seg.point.y / grid) * grid
 					}
 				}
 			})
