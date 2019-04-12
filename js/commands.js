@@ -15,6 +15,7 @@ var commands = {
 					strokeJoin: "round",
 					strokeCap: "round"
 				})
+				e.tool.path = item
 				e.tool.items.push(item)
 			} else if (e.type == "mousedrag") {
 				if (e.tool.speed) {
@@ -64,8 +65,16 @@ var commands = {
 							item.firstSegment.point = e.point
 							item.lastSegment.point = e.point
 						}
+
+						for (let i = item.segments.length - 1; i >= 0; i--) {
+							let seg = item.segments[i]
+							if (seg.previous) {
+								if (seg.point.x == seg.previous.point.x && seg.point.y == seg.previous.point.y) {
+									seg.remove()
+								}
+							}
+						}
 					}
-					console.log(item.fillColor)
 				})
 			}
 		},
@@ -78,7 +87,7 @@ var commands = {
 				? e.delta
 						.rotate(-90)
 						.normalize()
-						.multiply(Math.random() * 40)
+						.multiply(Math.random() * grid)
 				: new Point(0, 0)
 			let size = e.type == "mousedrag" ? (e.tool.speed ? e.tool.avgDelta : 10) : 10
 			let item = new Shape.Circle({
@@ -143,8 +152,8 @@ var commands = {
 			} else if (e.type == "mouseup") {
 				if (e.tool.snap) {
 					for (let seg of e.tool.guide.segments) {
-						seg.point.x = Math.round(seg.point.x / 40) * 40
-						seg.point.y = Math.round(seg.point.y / 40) * 40
+						seg.point.x = Math.round(seg.point.x / grid) * grid
+						seg.point.y = Math.round(seg.point.y / grid) * grid
 					}
 				} else {
 					e.tool.guide.simplify()
@@ -152,8 +161,14 @@ var commands = {
 				for (let idx in e.tool.items) {
 					if (e.tool.items[idx].className == "PointText") {
 						e.tool.items[idx].position = e.tool.guide.getPointAt((e.tool.guide.length / e.tool.items.length) * idx)
+
+						if (e.tool.snap) {
+							e.tool.items[idx].position.x = Math.round(e.tool.items[idx].position.x / grid) * grid
+							e.tool.items[idx].position.y = Math.round(e.tool.items[idx].position.y / grid) * grid
+						}
 					}
 				}
+
 				e.tool.guide.remove()
 			}
 		},

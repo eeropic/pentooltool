@@ -43,7 +43,7 @@ function mapCommands(id, event) {
 }
 
 var penTool = new Tool({ minDistance: 2 })
-penTool.text = "Hello World!"
+penTool.text = null
 penTool.prevDelta = 0
 penTool.currDelta = 0
 penTool.avgDelta = 0
@@ -159,6 +159,7 @@ $("ol.commands").sortable({
 		$item.removeClass(container.group.options.draggedClass).removeAttr("style")
 		$("body").removeClass(container.group.options.bodyClass)
 		if (this.canceled) {
+			if ($item.data("cmd") == "create-text") penTool.text = null
 			$item.remove()
 			if (this.cloneItem != null && container.target[0].id != "components") this.cloneItem.remove()
 			this.canceled = false
@@ -182,6 +183,9 @@ $("ol.commands").sortable({
 				$($item).addClass("color-" + selectedColor)
 			}
 
+			if ($($item).data("cmd") == "create-text") {
+				if (penTool.text == null) penTool.text = prompt("Enter text")
+			}
 			$($item).on("mousedown touchend", function(e) {
 				if (
 					$($item)
