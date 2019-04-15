@@ -1,6 +1,12 @@
 paper.install(window)
 paper.setup("canvas")
 
+var drawingData = localStorage.getItem("touchProto")
+if (drawingData != null) {
+	project.clear()
+	project.importJSON(JSON.parse(drawingData))
+}
+
 document.body.addEventListener("touchstart", null, { passive: false })
 document.body.addEventListener("touchmove", null, { passive: false })
 document.body.addEventListener("touchend", null, { passive: false })
@@ -9,7 +15,7 @@ $("#gui, #components, #commands, #colors").on("touchstart touchmove", function(e
 	e.preventDefault()
 })
 
-var globalColors = ["#303240", "#0033dd", "#ff83b4", "#eebb44", "#33ddff"]
+var globalColors = ["#303240", "#0033dd", "#ff83b4", "#ffbb44", "#66dddd"]
 globalColors.forEach(function(val, idx) {
 	document.documentElement.style.setProperty("--color-" + (idx + 1), val)
 })
@@ -42,11 +48,12 @@ function mapCommands(id, event) {
 	}
 }
 
-var penTool = new Tool({ minDistance: 2 })
+var penTool = new Tool({ minDistance: 3 })
 penTool.text = null
 penTool.prevDelta = 0
 penTool.currDelta = 0
 penTool.avgDelta = 0
+penTool.maxUndoLevels = 10
 penTool.history = {
 	projects: [project.exportJSON(false)],
 	index: 0
@@ -55,7 +62,6 @@ penTool.history = {
 //mouse event handling
 
 function updateUndoButtons(tool) {
-	logHistory()
 	$("#undo").css("opacity", tool.history.index > 0 && tool.history.projects.length > 0 ? 1 : 0.5)
 	$("#redo").css("opacity", tool.history.index < tool.history.projects.length - 1 ? 1 : 0.5)
 }
@@ -67,7 +73,7 @@ function handleUndoHistory(tool) {
 		tool.history.projects.length = Math.max(1, tool.history.index)
 		tool.history.projects.push(project.exportJSON(false))
 		tool.history.index = tool.history.projects.length - 1
-	} else if (tool.history.projects.length > 4) {
+	} else if (tool.history.projects.length > tool.maxUndoLevels) {
 		tool.history.projects.shift()
 		tool.history.index = Math.max(0, tool.history.index - 1)
 	}
@@ -85,14 +91,21 @@ penTool.on({
 	mousedrag(e) {
 		this.prevDelta = this.currDelta
 		this.currDelta = e.delta.length
-		this.avgDelta = (this.prevDelta + this.currDelta) / 2
+		this.avgDelta = Math.min(64, (this.prevDelta + this.currDelta) / 2)
 		mapCommands("#commands", e)
+		this.items.map(function(item) {
+			item.data.drawing = true
+		})
 	},
 	mouseup(e) {
 		mapCommands("#commands", e)
+		this.items.map(function(item) {
+			item.data.drawing = null
+		})
 		this.items = []
 		handleUndoHistory(this)
 		updateUndoButtons(this)
+		if (e.count % 10 == 0) localStorage.setItem("touchProto", JSON.stringify(project.exportJSON({ asString: true })))
 	}
 })
 
@@ -159,7 +172,20 @@ $("ol.commands").sortable({
 		$item.removeClass(container.group.options.draggedClass).removeAttr("style")
 		$("body").removeClass(container.group.options.bodyClass)
 		if (this.canceled) {
-			if ($item.data("cmd") == "create-text") penTool.text = null
+			if ($item.data("cmd") == "create-text") {
+				var deleteText = true
+
+				$("#commands")
+					.children()
+					.each(function() {
+						if ($(this).data("cmd") == "create-text") {
+							deleteText = false
+						}
+					})
+
+				if (deleteText) penTool.text = null
+			}
+
 			$item.remove()
 			if (this.cloneItem != null && container.target[0].id != "components") this.cloneItem.remove()
 			this.canceled = false
@@ -270,7 +296,7 @@ $("#undo").click(function() {
 	penTool.history.index = Math.max(0, penTool.history.index - 1)
 	project.clear()
 	project.importJSON(penTool.history.projects[penTool.history.index])
-	logHistory()
+	//logHistory()
 	updateUndoButtons(penTool)
 })
 
@@ -278,7 +304,7 @@ $("#redo").click(function() {
 	penTool.history.index = Math.max(0, Math.min(penTool.history.projects.length - 1, penTool.history.index + 1))
 	project.clear()
 	project.importJSON(penTool.history.projects[penTool.history.index])
-	logHistory()
+	//logHistory()
 	updateUndoButtons(penTool)
 })
 
@@ -286,11 +312,6 @@ function logHistory() {
 	console.log("i " + penTool.history.index, "len " + penTool.history.projects.length)
 }
 
-//        $("html").attr("style", "--color-1:hotpink");
-
-/*
-      let bodyStyles = window.getComputedStyle(document.body)
-      let color = 
-      project.currentStyle.fillColor = color
-      project.currentStyle.strokeColor = color
-      */
+$(window).on("unload", function(event) {
+	localStorage.setItem("touchProto", JSON.stringify(project.exportJSON({ asString: true })))
+})

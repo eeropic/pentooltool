@@ -137,11 +137,16 @@ var commands = {
 					strokeWidth: 2
 				})
 			} else if (e.type == "mousedrag") {
+				let chars = [...e.tool.text]
+				let charIndex = e.count % chars.length
+				let codePointAtIndex = chars[charIndex].codePointAt(0)
+
 				let text = new PointText({
 					position: e.point,
 					fontSize: e.tool.speed ? Math.max(20, e.tool.avgDelta * 2) : 20,
 					strokeWidth: 0,
-					content: e.tool.text[e.count % e.tool.text.length],
+					content: chars[charIndex],
+					fontFamily: codePointAtIndex < 256 ? "HelveticaNeue-Bold" : "AppleColorEmoji",
 					fillColor: color
 				})
 
@@ -179,7 +184,7 @@ var commands = {
 		cmd: function(e) {
 			let hit = project.hitTest(e.point)
 			if (hit && hit.item) {
-				hit.item.remove()
+				if (hit.item.data.drawing == null) hit.item.remove()
 			}
 		},
 		icon: "fa-eraser"
@@ -213,13 +218,17 @@ var commands = {
 			if (e.type == "mouseup") {
 				let cloneItems = []
 				e.tool.items.forEach(function(elem) {
-					let clone = elem.clone()
-					if (clone.strokeColor != null) clone.strokeColor = color
-					if (clone.fillColor != null) clone.fillColor = color
-					cloneItems.push(clone)
-					clone.position = clone.position.add([grid, -grid])
+					if (elem.data.cloned == null) {
+						let clone = elem.clone()
+						if (clone.strokeColor != null) clone.strokeColor = color
+						if (clone.fillColor != null) clone.fillColor = color
+						cloneItems.push(clone)
+						clone.position = clone.position.add([grid, -grid])
+						elem.data.cloned = true
+					}
 				})
-				e.tool.items = cloneItems
+
+				e.tool.items = e.tool.items.concat(cloneItems)
 			}
 		},
 		icon: "fa-clone"
