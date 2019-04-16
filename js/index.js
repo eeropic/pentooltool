@@ -172,20 +172,6 @@ $("ol.commands").sortable({
 		$item.removeClass(container.group.options.draggedClass).removeAttr("style")
 		$("body").removeClass(container.group.options.bodyClass)
 		if (this.canceled) {
-			if ($item.data("cmd") == "create-text") {
-				var deleteText = true
-
-				$("#commands")
-					.children()
-					.each(function() {
-						if ($(this).data("cmd") == "create-text") {
-							deleteText = false
-						}
-					})
-
-				if (deleteText) penTool.text = null
-			}
-
 			$item.remove()
 			if (this.cloneItem != null && container.target[0].id != "components") this.cloneItem.remove()
 			this.canceled = false
@@ -209,9 +195,6 @@ $("ol.commands").sortable({
 				$($item).addClass("color-" + selectedColor)
 			}
 
-			if ($($item).data("cmd") == "create-text") {
-				if (penTool.text == null) penTool.text = prompt("Enter text")
-			}
 			$($item).on("mousedown touchend", function(e) {
 				if (
 					$($item)
@@ -314,4 +297,8 @@ function logHistory() {
 
 $(window).on("unload", function(event) {
 	localStorage.setItem("touchProto", JSON.stringify(project.exportJSON({ asString: true })))
+})
+
+$("#textInputField").on("input", function(event) {
+	penTool.text = this.value
 })
