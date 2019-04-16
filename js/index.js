@@ -68,7 +68,7 @@ function mapCommands(id, event) {
 }
 
 var penTool = new Tool({ minDistance: 3 })
-penTool.text = null
+penTool.text = $("#textInputField").val()
 penTool.prevDelta = 0
 penTool.currDelta = 0
 penTool.avgDelta = 0
