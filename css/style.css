@@ -38,8 +38,7 @@ ol.blocks {
 	background: #e0e0e0;
 	border-radius: 1rem;
 	height: 3rem;
-	margin-right: 0.25rem;
-	margin-top: 0.25rem;
+	margin-bottom: 0.25rem;
 }
 
 ol.blocks-vertical {
@@ -47,7 +46,6 @@ ol.blocks-vertical {
 	background: #e0e0e0;
 	border-radius: 1rem;
 	width: 3rem;
-	margin-right: 0.25rem;
 	margin-top: 0.25rem;
 }
 
@@ -82,8 +80,8 @@ canvas[resize] {
 	z-index: 999;
 	height: 8rem;
 	position: absolute;
-	bottom: 0.5rem;
-	left: 0.5rem;
+	bottom: 1rem;
+	left: 0.25rem;
 }
 
 .command-rows {
@@ -179,8 +177,8 @@ ol#commands::after {
 	flex-direction: column;
 	min-width: 3rem;
 	position: absolute;
-	right: 0;
-	bottom: 0;
+	right: 0.25rem;
+	bottom: 1rem;
 }
 
 .color {
