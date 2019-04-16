@@ -246,6 +246,7 @@ $("ol.commands").sortable({
 			})
 		}
 		this.cloneItem = null
+		localStorage.setItem("touchCommands", JSON.stringify(getCommands("#commands")))
 	}
 })
 
@@ -333,7 +334,6 @@ function logHistory() {
 $(window).on("unload", function(event) {
 	localStorage.setItem("touchProto", JSON.stringify(project.exportJSON({ asString: true })))
 	localStorage.setItem("touchText", $("#textInputField").val())
-	console.log(JSON.stringify(getCommands("#commands")))
 	localStorage.setItem("touchCommands", JSON.stringify(getCommands("#commands")))
 })
 
