@@ -9,7 +9,10 @@ if (drawingData != null) {
 	project.clear()
 	project.importJSON(JSON.parse(drawingData))
 }
-if (drawingData != null) $("#textInputField").val(textData)
+if (textData != null) {
+	penTool.text = textData
+	$("#textInputField").val(textData)
+}
 
 document.body.addEventListener("touchstart", null, { passive: false })
 document.body.addEventListener("touchmove", null, { passive: false })
