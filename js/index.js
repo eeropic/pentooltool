@@ -2,10 +2,14 @@ paper.install(window)
 paper.setup("canvas")
 
 var drawingData = localStorage.getItem("touchProto")
+var textData = localStorage.getItem("touchText")
+var commandsData = localStorage.getItem("touchCommands")
+
 if (drawingData != null) {
 	project.clear()
 	project.importJSON(JSON.parse(drawingData))
 }
+if (drawingData != null) $("#textInputField").val(textData)
 
 document.body.addEventListener("touchstart", null, { passive: false })
 document.body.addEventListener("touchmove", null, { passive: false })
@@ -21,6 +25,18 @@ globalColors.forEach(function(val, idx) {
 })
 
 var grid = 20
+
+function getCommands(id) {
+	return $(id)
+		.children()
+		.map(function(idx, elem) {
+			return {
+				id: $(elem).data().cmd,
+				color: $(elem).attr("data-color") != null ? $(elem).attr("data-color") : null
+			}
+		})
+		.toArray()
+}
 
 function mapCommands(id, event) {
 	let cmds = $(id)
@@ -139,6 +155,25 @@ $("#commands").append(createPath)
 $(".color")
 	.first()
 	.addClass("select")
+
+if (commandsData != null) {
+	commandsData = JSON.parse(commandsData)
+
+	$("#commands")
+		.children()
+		.each(function() {
+			$(this).remove()
+		})
+
+	$("#commands").append(
+		commandsData.map(function(entry, index) {
+			let obj = commands[entry.id]
+			return `<li class="fas block ${
+				obj.icon
+			} color-${entry.color}" data-cmd="${entry.id}" data-color="${entry.color}"/>`
+		})
+	)
+}
 
 //GUI drag & drop handling
 
@@ -297,6 +332,9 @@ function logHistory() {
 
 $(window).on("unload", function(event) {
 	localStorage.setItem("touchProto", JSON.stringify(project.exportJSON({ asString: true })))
+	localStorage.setItem("touchText", $("#textInputField").val())
+	console.log(JSON.stringify(getCommands("#commands")))
+	localStorage.setItem("touchCommands", JSON.stringify(getCommands("#commands")))
 })
 
 $("#textInputField").on("input", function(event) {
