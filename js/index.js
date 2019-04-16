@@ -14,9 +14,12 @@ document.body.addEventListener("touchstart", null, { passive: false })
 document.body.addEventListener("touchmove", null, { passive: false })
 document.body.addEventListener("touchend", null, { passive: false })
 
-$("#gui, #components, #commands, #colors").on("touchstart touchmove", function(e) {
-	e.preventDefault()
-})
+$("#gui, #components, #commands, #colors, #textInputField, #gui-top, #undo, #redo, #clear").on(
+	"touchstart touchmove",
+	function(e) {
+		e.preventDefault()
+	}
+)
 
 var globalColors = ["#303240", "#0033dd", "#ff83b4", "#ffbb44", "#66dddd"]
 globalColors.forEach(function(val, idx) {
