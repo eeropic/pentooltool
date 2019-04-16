@@ -9,10 +9,6 @@ if (drawingData != null) {
 	project.clear()
 	project.importJSON(JSON.parse(drawingData))
 }
-if (textData != null) {
-	penTool.text = textData
-	$("#textInputField").val(textData)
-}
 
 document.body.addEventListener("touchstart", null, { passive: false })
 document.body.addEventListener("touchmove", null, { passive: false })
@@ -76,6 +72,11 @@ penTool.maxUndoLevels = 10
 penTool.history = {
 	projects: [project.exportJSON(false)],
 	index: 0
+}
+
+if (textData != null) {
+	penTool.text = textData
+	$("#textInputField").val(textData)
 }
 
 //mouse event handling
