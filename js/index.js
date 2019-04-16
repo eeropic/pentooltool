@@ -339,4 +339,5 @@ $(window).on("unload", function(event) {
 
 $("#textInputField").on("input", function(event) {
 	penTool.text = this.value
+	localStorage.setItem("touchText", this.value)
 })
